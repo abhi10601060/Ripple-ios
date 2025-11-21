@@ -6,14 +6,18 @@
 //
 
 import SwiftUI
+import FactoryKit
 
 struct ContentView: View {
+    
+    @Injected(\.diTestModel) var diTestModel: DiTestModel
+    
     var body: some View {
         VStack {
             Image(systemName: "globe")
                 .imageScale(.large)
                 .foregroundStyle(.tint)
-            Text("Hello, world!")
+            Text(diTestModel.text)
         }
         .padding()
     }

@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		AB65C5ED2ED0BF2500282A1F /* FactoryKit in Frameworks */ = {isa = PBXBuildFile; productRef = AB65C5EC2ED0BF2500282A1F /* FactoryKit */; };
+		AB65C5F02ED0BF2D00282A1F /* Factory in Frameworks */ = {isa = PBXBuildFile; productRef = AB65C5EF2ED0BF2D00282A1F /* Factory */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		AB65C5C22ED0BC0400282A1F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +57,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AB65C5ED2ED0BF2500282A1F /* FactoryKit in Frameworks */,
+				AB65C5F02ED0BF2D00282A1F /* Factory in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +85,7 @@
 				AB65C5B62ED0BC0200282A1F /* Ripple */,
 				AB65C5C42ED0BC0400282A1F /* RippleTests */,
 				AB65C5CE2ED0BC0400282A1F /* RippleUITests */,
+				AB65C5EE2ED0BF2D00282A1F /* Frameworks */,
 				AB65C5B52ED0BC0200282A1F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -90,6 +98,13 @@
 				AB65C5CB2ED0BC0400282A1F /* RippleUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		AB65C5EE2ED0BF2D00282A1F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -112,6 +127,8 @@
 			);
 			name = Ripple;
 			packageProductDependencies = (
+				AB65C5EC2ED0BF2500282A1F /* FactoryKit */,
+				AB65C5EF2ED0BF2D00282A1F /* Factory */,
 			);
 			productName = Ripple;
 			productReference = AB65C5B42ED0BC0200282A1F /* Ripple.app */;
@@ -195,6 +212,9 @@
 			);
 			mainGroup = AB65C5AB2ED0BC0200282A1F;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				AB65C5EB2ED0BF2400282A1F /* XCRemoteSwiftPackageReference "Factory" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = AB65C5B52ED0BC0200282A1F /* Products */;
 			projectDirPath = "";
@@ -570,6 +590,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		AB65C5EB2ED0BF2400282A1F /* XCRemoteSwiftPackageReference "Factory" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hmlongco/Factory.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.3;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		AB65C5EC2ED0BF2500282A1F /* FactoryKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AB65C5EB2ED0BF2400282A1F /* XCRemoteSwiftPackageReference "Factory" */;
+			productName = FactoryKit;
+		};
+		AB65C5EF2ED0BF2D00282A1F /* Factory */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AB65C5EB2ED0BF2400282A1F /* XCRemoteSwiftPackageReference "Factory" */;
+			productName = Factory;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = AB65C5AC2ED0BC0200282A1F /* Project object */;
 }
