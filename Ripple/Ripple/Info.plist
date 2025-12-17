@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <!-- Local Network Permission -->
+        <key>NSLocalNetworkUsageDescription</key>
+        <string>This app uses the local network to discover and connect with nearby devices for peer-to-peer communication.</string>
+        
+        <!-- Bonjour Services -->
+        <key>NSBonjourServices</key>
+        <array>
+            <string>_ripple-nearby._tcp</string>
+            <string>_ripple-nearby._udp</string>
+            <string>_126CE96E9DEE._tcp.</string>
+        </array>
+
+    </dict>
+</plist>

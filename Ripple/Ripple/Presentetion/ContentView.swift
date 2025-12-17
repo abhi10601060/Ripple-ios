@@ -13,13 +13,7 @@ struct ContentView: View {
     @Injected(\.diTestModel) var diTestModel: DiTestModel
     
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text(diTestModel.text)
-        }
-        .padding()
+        NearbyShareView()
     }
 }
 
