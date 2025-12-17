@@ -13,63 +13,18 @@ import UIKit
 import os
 
 // MARK: - Models
-
-enum ConnectionState: String, Codable {
-    case discovered
-    case connecting
-    case connected
-    case disconnected
-    case error
-}
-
-enum DeliveryStatus: String, Codable {
-    case pending
-    case sent
-    case delivered
-    case failed
-}
-
-struct NearbyDevice: Identifiable, Equatable {
-    let id: String
-    let deviceName: String
-    var connectionState: ConnectionState
-    
-    init(id: String = UUID().uuidString, deviceName: String, connectionState: ConnectionState) {
-        self.id = id
-        self.deviceName = deviceName
-        self.connectionState = connectionState
-    }
-}
-
-struct TextMessage: Identifiable, Codable {
-    let id: String
-    let content: String
-    let senderId: String
-    let receiverId: String
-    var deliveryStatus: DeliveryStatus
-    let timestamp: Date
-    
-    init(id: String = UUID().uuidString, content: String, senderId: String, receiverId: String, deliveryStatus: DeliveryStatus, timestamp: Date = Date()) {
-        self.id = id
-        self.content = content
-        self.senderId = senderId
-        self.receiverId = receiverId
-        self.deliveryStatus = deliveryStatus
-        self.timestamp = timestamp
-    }
-}
-
 struct ClusterInfo: Identifiable {
     let id: String
     var devices: [NearbyDevice]
     var isActive: Bool
-    
+
     init(id: String = UUID().uuidString, devices: [NearbyDevice], isActive: Bool) {
         self.id = id
         self.devices = devices
         self.isActive = isActive
     }
 }
+
 
 
 
@@ -244,7 +199,9 @@ class NearbyShareManager: NSObject, ObservableObject {
         let clusterId = UUID().uuidString
         let currentDevice = NearbyDevice(
             id: deviceName,
+            endpointId: "abc",
             deviceName: deviceName,
+            model: "iPhone 17",
             connectionState: .connected
         )
         
@@ -576,7 +533,9 @@ extension NearbyShareManager: DiscovererDelegate {
             
             let device = NearbyDevice(
                 id: deviceName,
+                endpointId: endpointID.lowercased(),
                 deviceName: deviceName,
+                model: "iphone 17",
                 connectionState: .discovered
             )
             
