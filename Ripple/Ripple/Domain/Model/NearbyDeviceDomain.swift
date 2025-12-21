@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct NearbyDeviceDomain {
+struct NearbyDeviceDomain: Identifiable {
     let id: String
     let endpointId: String
     let deviceName: String
@@ -52,7 +52,33 @@ extension NearbyDeviceDomain{
     static let mock = NearbyDeviceDomain(
         id: "123",
         endpointId: "abc",
-        deviceName: "abcdefghijk",
+        deviceName: "Abhis' Phone",
+        model: "xyz",
+        connectionState: .connected,
+        visibility: .online,
+        lastSeen: Int64(Date().timeIntervalSince1970 * 1000),
+        signalStrength: 100,
+        recentMessage: TextMessageDomain.mock,
+        allMessages: [TextMessageDomain.mock, TextMessageDomain.mock]
+    )
+    
+    static let mock1 = NearbyDeviceDomain(
+        id: "456",
+        endpointId: "efg",
+        deviceName: "Abhis' Mac",
+        model: "xyz",
+        connectionState: .connected,
+        visibility: .online,
+        lastSeen: Int64(Date().timeIntervalSince1970 * 1000),
+        signalStrength: 100,
+        recentMessage: TextMessageDomain.mock,
+        allMessages: [TextMessageDomain.mock, TextMessageDomain.mock]
+    )
+    
+    static let mock2 = NearbyDeviceDomain(
+        id: "789",
+        endpointId: "ijk",
+        deviceName: "Abhis' Tab",
         model: "xyz",
         connectionState: .connected,
         visibility: .online,

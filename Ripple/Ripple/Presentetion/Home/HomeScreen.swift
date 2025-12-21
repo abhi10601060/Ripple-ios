@@ -17,6 +17,13 @@ struct HomeScreen: View {
                 alignment: .trailing
             ) {
                 HomeScreenHeader
+                
+                if selectedTab == "Chats" {
+                    InboxScreen()
+                }
+                else{
+                    ActiveUsersScreen()
+                }
             }
             .frame(
                 maxWidth: .infinity,

@@ -53,6 +53,7 @@ struct CircularImage: View {
                         .frame(width: size, height: size)
                         .clipShape(Circle())
                         .foregroundColor(Color(.systemGray4))
+                
             }
         }
         
@@ -61,7 +62,7 @@ struct CircularImage: View {
 
 #Preview {
     ZStack{
-        CircularImage(imageName: "WhiteRippleLogo", size: 64)
+        CircularImage(imageName: "xmark.circle.fill", size: 64)
     }
     .background(.darkBG)
     
