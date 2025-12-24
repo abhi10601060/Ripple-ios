@@ -6,3 +6,12 @@
 //
 
 import Foundation
+import FactoryKit
+
+struct DisconnectNearbyDeviceUseCase{
+    @Injected(\.nearbyConnectionRepo) var nearbyConnectionRepo: NearbyConnectionRepo
+    
+    func invoke(endpointId: String) async -> Bool{
+        return await nearbyConnectionRepo.disconnectNearbyDevice(endpoitId: endpointId)
+    }
+}

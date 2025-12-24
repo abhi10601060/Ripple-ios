@@ -8,10 +8,10 @@
 import Foundation
 import FactoryKit
 
-struct StartConnectingToNearbyDeviceUseCase{
+struct ConnectNearbyDeviceUseCase{
     @Injected(\.nearbyConnectionRepo) var nearbyConnectionRepo: NearbyConnectionRepo
     
-    func invoke(){
-        
+    func invoke(endpointId: String) async -> Bool {
+        return await nearbyConnectionRepo.connectNearbyDevice(endpoitId: endpointId)
     }
 }

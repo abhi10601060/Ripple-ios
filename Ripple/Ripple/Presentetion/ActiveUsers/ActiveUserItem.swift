@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ActiveUserItem: View {
     
+    @ObservedObject var homeScreenViewModel: HomeScreenViewModel
     let nearbyDevice: NearbyDeviceDomain
     
     var body: some View {
@@ -55,6 +56,15 @@ struct ActiveUserItem: View {
                         .fill(.secondaryDarkBG)
                 }
                 .padding(.top, 8)
+                .onTapGesture {
+                    if self.nearbyDevice.connectionState == .connected {
+                        homeScreenViewModel.disconnectFromNearbyDevice(device: self.nearbyDevice)
+                    }
+                    else{
+                        homeScreenViewModel.connectToNearbyDevice(device: self.nearbyDevice)
+                    }
+                }
+                
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -63,6 +73,7 @@ struct ActiveUserItem: View {
 #Preview {
     ZStack{
         ActiveUserItem(
+            homeScreenViewModel: HomeScreenViewModel(),
             nearbyDevice: NearbyDeviceDomain.mock
         )
     }

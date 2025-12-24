@@ -15,7 +15,7 @@ struct ActiveUsersScreen: View {
     var body: some View {
         LazyVStack{
             ForEach(viewModel.discoveredDevices) { device in
-                ActiveUserItem(nearbyDevice: device)
+                ActiveUserItem(homeScreenViewModel: viewModel, nearbyDevice: device)
                 
                 Spacer()
                     .frame(maxWidth: .infinity, maxHeight: 0.8)

@@ -18,6 +18,10 @@ protocol NearbyConnectionRepo {
     
     func stopAdvertising()
     
+    func connectNearbyDevice(endpoitId: String) async -> Bool
+    
+    func disconnectNearbyDevice(endpoitId: String) async -> Bool
+    
     func getNearbyDiscoveredDevices() -> AnyPublisher<[NearbyDevice], Never>
     
     func getNearbyConnectedDevices() -> AnyPublisher<[NearbyDevice], Never>

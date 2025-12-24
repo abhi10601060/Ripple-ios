@@ -149,7 +149,7 @@ struct NearbyShareView: View {
                 ForEach(manager.discoveredDevices) { device in
                     DeviceRow(device: device) {
                         Task {
-                            let success = await manager.connectToDevice(deviceId: device.id)
+                            let success = await manager.connectToDevice(endpointId: device.id)
                             statusMessage = success ? "Connecting to \(device.deviceName)..." : "Failed to connect"
                         }
                     }
@@ -180,7 +180,7 @@ struct NearbyShareView: View {
                         showingMessageSheet = true
                     }, onDisconnect: {
                         Task {
-                            await manager.disconnectFromDevice(deviceId: device.id)
+                            await manager.disconnectFromDevice(endpointId: device.id)
                             statusMessage = "Disconnected from \(device.deviceName)"
                         }
                     })

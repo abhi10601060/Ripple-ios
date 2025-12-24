@@ -22,6 +22,7 @@ struct HomeScreen: View {
                 
                 if selectedTab == "Chats" {
                     InboxScreen(
+                        homeScreenViewModel: homeScreenViewModel,
                         navigationPath: $navigationPath
                     )
                 }

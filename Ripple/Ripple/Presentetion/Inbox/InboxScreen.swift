@@ -9,6 +9,7 @@ import SwiftUI
 
 struct InboxScreen: View {
     
+    @ObservedObject var homeScreenViewModel: HomeScreenViewModel
     @Binding var navigationPath: NavigationPath
     @State var searchText: String = ""
     @State var connectedDevices: [NearbyDeviceDomain] = [NearbyDeviceDomain.mock, NearbyDeviceDomain.mock1, NearbyDeviceDomain.mock2]
@@ -20,7 +21,7 @@ struct InboxScreen: View {
             SearchBox
             
             LazyVStack{
-                ForEach(connectedDevices){ device in
+                ForEach(homeScreenViewModel.connectedDevices){ device in
                     
                     InboxItem(nearbyDevice: device)
                         .onTapGesture {
@@ -59,6 +60,7 @@ struct InboxScreen: View {
     @Previewable @State var navpath = NavigationPath()
     NavigationStack(path: $navpath) {
         InboxScreen(
+            homeScreenViewModel: HomeScreenViewModel(),
             navigationPath: $navpath
         )
     }

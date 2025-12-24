@@ -123,43 +123,43 @@ class NearbyConnectionManager: NSObject, ObservableObject {
         return true
     }
     
-    func connectToDevice(deviceId: String) async -> Bool {
-        guard let endpointId = findEndpointID(for: deviceId) else {
-            logger.debug("Cannot find endpoint for device: \(deviceId)")
-            return false
-        }
+    func connectToDevice(endpointId: String) async -> Bool {
+//        guard let endpointId = findEndpointID(for: endpointId) else {
+//            logger.debug("Cannot find endpoint for device: \(endpointId) \(endpointId.count)")
+//            return false
+//        }
         
-        updateDeviceConnectionState(deviceId: deviceId, state: .connecting)
+        updateDeviceConnectionState(endpointId: endpointId, state: .connecting)
         
         // Request connection with device name as context
         let context = deviceName.data(using: .utf8) ?? Data()
         discoverer?.requestConnection(to: endpointId, using: context) { [weak self] accepted in
             Task { @MainActor in
                 if (accepted != nil) {
-                    self?.logger.info("Connection request accepted for: \(deviceId)")
-                    self?.updateDeviceConnectionState(deviceId: deviceId, state: .connected)
+                    self?.logger.info("Connection request accepted for: \(endpointId)")
+                    self?.updateDeviceConnectionState(endpointId: endpointId, state: .connected)
                 } else {
-                    self?.logger.info("Connection request rejected for: \(deviceId)")
-                    self?.updateDeviceConnectionState(deviceId: deviceId, state: .error)
+                    self?.logger.info("Connection request rejected for: \(endpointId)")
+                    self?.updateDeviceConnectionState(endpointId: endpointId, state: .disconnected)
                 }
             }
         }
         
-        logger.debug("Connection requested to: \(deviceId)")
+        logger.debug("Connection requested to: \(endpointId)")
         return true
     }
     
-    func disconnectFromDevice(deviceId: String) async -> Bool {
-        guard let endpointId = findEndpointID(for: deviceId) else {
-            return false
-        }
+    func disconnectFromDevice(endpointId: String) async -> Bool {
+//        guard let endpointId = findEndpointID(for: endpointId) else {
+//            return false
+//        }
         
         connectionManager.disconnect(from: endpointId)
-        updateDeviceConnectionState(deviceId: deviceId, state: .disconnected)
+        updateDeviceConnectionState(endpointId: endpointId, state: .disconnected)
         connectionPool.removeValue(forKey: endpointId)
         endpointToDeviceID.removeValue(forKey: endpointId)
         
-        print("Disconnected from: \(deviceId)")
+        print("Disconnected from: \(endpointId)")
         return true
     }
     
@@ -265,17 +265,17 @@ class NearbyConnectionManager: NSObject, ObservableObject {
         discoveredDevices.removeAll { $0.id == deviceId }
     }
     
-    private func updateDeviceConnectionState(deviceId: String, state: ConnectionState) {
+    private func updateDeviceConnectionState(endpointId: String, state: ConnectionState) {
         // Update in discovered devices
-        if let index = discoveredDevices.firstIndex(where: { $0.id == deviceId }) {
+        if let index = discoveredDevices.firstIndex(where: { $0.endpointId == endpointId }) {
             discoveredDevices[index].connectionState = state
         }
         
         // Update connected devices list
         switch state {
         case .connected:
-            if let device = discoveredDevices.first(where: { $0.id == deviceId }) {
-                if !connectedDevices.contains(where: { $0.id == deviceId }) {
+            if let device = discoveredDevices.first(where: { $0.endpointId == endpointId }) {
+                if !connectedDevices.contains(where: { $0.endpointId == endpointId }) {
                     var connectedDevice = device
                     connectedDevice.connectionState = state
                     connectedDevices.append(connectedDevice)
@@ -283,10 +283,10 @@ class NearbyConnectionManager: NSObject, ObservableObject {
             }
             
         case .disconnected:
-            connectedDevices.removeAll { $0.id == deviceId }
+            connectedDevices.removeAll { $0.endpointId == endpointId }
             
         default:
-            if let index = connectedDevices.firstIndex(where: { $0.id == deviceId }) {
+            if let index = connectedDevices.firstIndex(where: { $0.endpointId == endpointId }) {
                 connectedDevices[index].connectionState = state
             }
         }
@@ -326,21 +326,21 @@ extension NearbyConnectionManager: ConnectionManagerDelegate {
             case .connected:
                 logger.info("Connected to: \(deviceId)")
                 connectionPool[endpointID] = deviceId
-                updateDeviceConnectionState(deviceId: deviceId, state: .connected)
+                updateDeviceConnectionState(endpointId: endpointID, state: .connected)
                 
             case .connecting:
                 logger.info("Connecting to: \(deviceId)")
-                updateDeviceConnectionState(deviceId: deviceId, state: .connecting)
+                updateDeviceConnectionState(endpointId: endpointID, state: .connecting)
                 
             case .disconnected:
                 logger.info("Disconnected from: \(deviceId)")
                 connectionPool.removeValue(forKey: endpointID)
                 endpointToDeviceID.removeValue(forKey: endpointID)
-                updateDeviceConnectionState(deviceId: deviceId, state: .disconnected)
+                updateDeviceConnectionState(endpointId: endpointID, state: .disconnected)
                 
             case .rejected:
                 logger.info("Connection rejected: \(deviceId)")
-                updateDeviceConnectionState(deviceId: deviceId, state: .error)
+                updateDeviceConnectionState(endpointId: endpointID, state: .error)
                 
 //            case .discovered:
 //                print("Discovered: \(deviceId)")
@@ -460,17 +460,17 @@ extension NearbyConnectionManager: ConnectionManagerDelegate {
             case .connected:
                 logger.info("Connected to: \(deviceId)")
                 connectionPool[endpointID] = deviceId
-                updateDeviceConnectionState(deviceId: deviceId, state: .connected)
+                updateDeviceConnectionState(endpointId: deviceId, state: .connected)
                 
             case .connecting:
                 logger.info("Connecting to: \(deviceId)")
-                updateDeviceConnectionState(deviceId: deviceId, state: .connecting)
+                updateDeviceConnectionState(endpointId: deviceId, state: .connecting)
                 
             case .disconnected:
                 logger.info("Disconnected from: \(deviceId)")
                 connectionPool.removeValue(forKey: endpointID)
                 endpointToDeviceID.removeValue(forKey: endpointID)
-                updateDeviceConnectionState(deviceId: deviceId, state: .disconnected)
+                updateDeviceConnectionState(endpointId: deviceId, state: .disconnected)
                 
 //            case .rejected:
 //                print("Connection rejected: \(deviceId)")
@@ -478,7 +478,7 @@ extension NearbyConnectionManager: ConnectionManagerDelegate {
                 
             case .discovered:
                 logger.info("Discovered: \(deviceId)")
-                updateDeviceConnectionState(deviceId: deviceId, state: .discovered)
+                updateDeviceConnectionState(endpointId: deviceId, state: .discovered)
 
                 
             case .error:
@@ -511,7 +511,7 @@ extension NearbyConnectionManager: AdvertiserDelegate {
             
             endpointToDeviceID[endpointID] = remoteName
             connectionPool[endpointID] = remoteName
-            updateDeviceConnectionState(deviceId: remoteName, state: .connected)
+            updateDeviceConnectionState(endpointId: remoteName, state: .connected)
 
         }
     }
@@ -534,13 +534,13 @@ extension NearbyConnectionManager: DiscovererDelegate {
             
             let device = NearbyDevice(
                 id: String(descriptionSplits[2]),
-                endpointId: endpointID.lowercased(),
+                endpointId: endpointID,
                 deviceName: String(descriptionSplits[0]),
                 model: String(descriptionSplits[1]),
                 connectionState: .discovered
             )
             
-            endpointToDeviceID[endpointID] = deviceName
+            endpointToDeviceID[endpointID] = device.deviceName
             addDiscoveredDevice(device)
         }
     }

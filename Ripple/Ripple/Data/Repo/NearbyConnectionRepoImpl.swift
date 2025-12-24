@@ -9,7 +9,7 @@ import Foundation
 import Combine
 
 struct NearbyConnectionRepoImpl: NearbyConnectionRepo {
-    
+
     let nearbyShareManager: NearbyConnectionManager
     
     init(nearbyShareManager: NearbyConnectionManager) {
@@ -38,6 +38,14 @@ struct NearbyConnectionRepoImpl: NearbyConnectionRepo {
         Task{
             await nearbyShareManager.stopAdvertising()
         }
+    }
+    
+    func connectNearbyDevice(endpoitId: String) async -> Bool {
+        return await nearbyShareManager.connectToDevice(endpointId: endpoitId)
+    }
+    
+    func disconnectNearbyDevice(endpoitId: String) async -> Bool {
+        return await nearbyShareManager.disconnectFromDevice(endpointId: endpoitId)
     }
     
     func getNearbyDiscoveredDevices() -> AnyPublisher<[NearbyDevice], Never> {
