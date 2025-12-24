@@ -31,7 +31,7 @@ struct ClusterInfo: Identifiable {
 // MARK: - NearbyShareManager
 
 @MainActor
-class NearbyShareManager: NSObject, ObservableObject {
+class NearbyConnectionManager: NSObject, ObservableObject {
     
     // MARK: - Logger
 
@@ -39,7 +39,7 @@ class NearbyShareManager: NSObject, ObservableObject {
     
     // MARK: - Singleton
     
-    static let shared = NearbyShareManager()
+    static let shared = NearbyConnectionManager()
     
     // MARK: - Published Properties
     
@@ -311,7 +311,7 @@ class NearbyShareManager: NSObject, ObservableObject {
 
 // MARK: - ConnectionManagerDelegate
 
-extension NearbyShareManager: ConnectionManagerDelegate {
+extension NearbyConnectionManager: ConnectionManagerDelegate {
     
     func connectionManager(_ connectionManager: NearbyConnections.ConnectionManager, didReceiveTransferUpdate update: NearbyConnections.TransferUpdate, from endpointID: NearbyConnections.EndpointID, forPayload payloadID: NearbyConnections.PayloadID) {
         
@@ -492,7 +492,7 @@ extension NearbyShareManager: ConnectionManagerDelegate {
 
 // MARK: - AdvertiserDelegate
 
-extension NearbyShareManager: AdvertiserDelegate {
+extension NearbyConnectionManager: AdvertiserDelegate {
     
     nonisolated func advertiser(
         _ advertiser: Advertiser,
@@ -519,7 +519,7 @@ extension NearbyShareManager: AdvertiserDelegate {
 
 // MARK: - DiscovererDelegate
 
-extension NearbyShareManager: DiscovererDelegate {
+extension NearbyConnectionManager: DiscovererDelegate {
     
     nonisolated func discoverer(
         _ discoverer: Discoverer,
@@ -528,14 +528,15 @@ extension NearbyShareManager: DiscovererDelegate {
     ) {
         Task { @MainActor in
             // Extract device name from endpoint info
-            let deviceName = String(data: context, encoding: .utf8) ?? endpointID.description
-            logger.info("Found device: \(deviceName)")
+            let deviceDescription = String(data: context, encoding: .utf8) ?? endpointID.description
+            let descriptionSplits = deviceDescription.split(separator: ":")
+            logger.info("Found device: \(deviceDescription)")
             
             let device = NearbyDevice(
-                id: deviceName,
+                id: String(descriptionSplits[2]),
                 endpointId: endpointID.lowercased(),
-                deviceName: deviceName,
-                model: "iphone 17",
+                deviceName: String(descriptionSplits[0]),
+                model: String(descriptionSplits[1]),
                 connectionState: .discovered
             )
             

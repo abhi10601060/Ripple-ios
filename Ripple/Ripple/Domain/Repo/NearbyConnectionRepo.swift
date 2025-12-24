@@ -6,3 +6,19 @@
 //
 
 import Foundation
+import Combine
+
+protocol NearbyConnectionRepo {
+    
+    func startDiscovery()
+    
+    func stopDiscovery()
+    
+    func startAdvertising()
+    
+    func stopAdvertising()
+    
+    func getNearbyDiscoveredDevices() -> AnyPublisher<[NearbyDevice], Never>
+    
+    func getNearbyConnectedDevices() -> AnyPublisher<[NearbyDevice], Never>
+}

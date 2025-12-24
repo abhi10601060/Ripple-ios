@@ -22,18 +22,18 @@ struct ActiveUserItem: View {
             ){
                 Text(nearbyDevice.deviceName)
                     .font(
-                        .custom(FontsConstants.Courier.rawValue, size: 20)
+                        .custom(FontsConstants.Courier.rawValue, size: 18)
                     )
                     .foregroundColor(.white)
                     .lineLimit(1)
                     .truncationMode(.tail)
                 
                 Spacer()
-                    .frame(height: 5)
+                    .frame(height: 10)
                 
                 Text("~\(nearbyDevice.model)")
                     .font(
-                        .custom(FontsConstants.Courier.rawValue, size: 20)
+                        .custom(FontsConstants.Courier.rawValue, size: 15)
                     )
                     .foregroundColor(.gray)
                     .lineLimit(1)

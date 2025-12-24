@@ -6,3 +6,14 @@
 //
 
 import Foundation
+import FactoryKit
+
+
+struct StartAdvertisingUseCase{
+    
+    @Injected(\.nearbyConnectionRepo) var nearByConnectionRepo: NearbyConnectionRepo
+    
+    func invoke() {
+        nearByConnectionRepo.startAdvertising()
+    }
+}

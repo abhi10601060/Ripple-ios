@@ -9,11 +9,12 @@ import SwiftUI
 
 struct ActiveUsersScreen: View {
     
+    @ObservedObject var viewModel: HomeScreenViewModel
     @State var discoveredDevices: [NearbyDeviceDomain] = [NearbyDeviceDomain.mock, NearbyDeviceDomain.mock1, NearbyDeviceDomain.mock2]
     
     var body: some View {
         LazyVStack{
-            ForEach(discoveredDevices) { device in
+            ForEach(viewModel.discoveredDevices) { device in
                 ActiveUserItem(nearbyDevice: device)
                 
                 Spacer()
@@ -28,7 +29,7 @@ struct ActiveUsersScreen: View {
 
 #Preview {
     ZStack{
-        ActiveUsersScreen()
+        ActiveUsersScreen(viewModel: HomeScreenViewModel())
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background(.darkBG)

@@ -6,3 +6,12 @@
 //
 
 import Foundation
+import FactoryKit
+
+struct StartDiscoveryUseCase{
+    @Injected(\.nearbyConnectionRepo) var nearByConnectionRepo: NearbyConnectionRepo
+    
+    func invoke() {
+        nearByConnectionRepo.startDiscovery()
+    }
+}

@@ -26,7 +26,7 @@ struct RippleIcon: View {
             
             Circle()
                 .fill(.white)
-                .frame(width: size * 1, height: size * 1)
+                .frame(width: size * 1.1, height: size * 1.1)
 
             
             Image(systemName: iconName)
@@ -40,7 +40,7 @@ struct RippleIcon: View {
 #Preview {
     ZStack {
         RippleIcon(
-            size: 25, iconName: "magnifyingglass"
+            size: 25, iconName: "paperplane.fill"
         )
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)

@@ -9,8 +9,8 @@ import SwiftUI
 
 struct InboxScreen: View {
     
+    @Binding var navigationPath: NavigationPath
     @State var searchText: String = ""
-    
     @State var connectedDevices: [NearbyDeviceDomain] = [NearbyDeviceDomain.mock, NearbyDeviceDomain.mock1, NearbyDeviceDomain.mock2]
     
     var body: some View {
@@ -23,6 +23,10 @@ struct InboxScreen: View {
                 ForEach(connectedDevices){ device in
                     
                     InboxItem(nearbyDevice: device)
+                        .onTapGesture {
+                            navigationPath.append(device)
+                        }
+                    
                     
                     Spacer()
                         .padding(10)
@@ -52,5 +56,10 @@ struct InboxScreen: View {
 }
 
 #Preview {
-    InboxScreen()
+    @Previewable @State var navpath = NavigationPath()
+    NavigationStack(path: $navpath) {
+        InboxScreen(
+            navigationPath: $navpath
+        )
+    }
 }

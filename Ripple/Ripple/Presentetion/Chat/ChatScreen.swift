@@ -8,11 +8,94 @@
 import SwiftUI
 
 struct ChatScreen: View {
+
+    let nearbyDevice: NearbyDeviceDomain
+    private let scrollId = "scrollToBottom"
+
+    @State var messageText: String = ""
+    @Environment(\.dismiss) var dismiss
+
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        ZStack {
+            VStack {
+                ChatScreenHeader
+                
+                ScrollView {
+                    ScrollViewReader { proxy in
+                        LazyVStack {
+                            ForEach(nearbyDevice.allMessages) { message in
+                                ChatTextMessage(
+                                    message: message,
+                                    isFromCurretUser: message.senderId
+                                        == nearbyDevice.id
+                                )
+                            }
+                            .id(scrollId)
+                        }
+                        .onChange(of: nearbyDevice.allMessages.count) {
+                            oldValue,
+                            newValue in
+                            // Scroll to the bottom when messages change
+                            withAnimation {
+                                proxy.scrollTo(scrollId, anchor: .bottom)
+                            }
+                        }
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+            ChatBox
+                .frame(
+                    maxWidth: .infinity,
+                    maxHeight: .infinity,
+                    alignment: .bottom
+                )
+                .padding(.horizontal, 10)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(.darkBG)
+        .toolbar(.hidden, for: .navigationBar)
+    }
+
+    var ChatScreenHeader: some View {
+        HStack {
+            
+            RippleIcon(
+                size: 20,
+                iconName: "chevron.left"
+            )
+            .onTapGesture {
+                dismiss()
+            }
+
+            CircularImage(imageName: "", size: 40)
+
+            Text(nearbyDevice.deviceName)
+                .font(Font.custom(FontsConstants.Montserrat.rawValue, size: 20))
+                .foregroundColor(.white)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    var ChatBox: some View {
+        HStack {
+            RippleTextField(
+                text: $messageText,
+                placeHolder: "Enter message here..."
+            )
+            .frame(maxWidth: .infinity)
+
+            RippleIcon(
+                size: 23,
+                iconName: "paperplane.fill"
+            )
+        }
     }
 }
 
 #Preview {
-    ChatScreen()
+    ChatScreen(
+        nearbyDevice: NearbyDeviceDomain.mock
+    )
 }

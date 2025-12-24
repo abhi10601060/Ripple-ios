@@ -16,4 +16,17 @@ extension Container{
             .singleton
     }
     
+    var nerbyConnectionManager: Factory<NearbyConnectionManager>{
+        Factory(self) { MainActor.assumeIsolated { NearbyConnectionManager.shared } }
+            .singleton
+    }
+    
+    var nearbyConnectionRepo: Factory<NearbyConnectionRepo>{
+        Factory(self){
+            MainActor.assumeIsolated{
+                NearbyConnectionRepoImpl(nearbyShareManager: self.nerbyConnectionManager())
+            }
+        }.singleton
+    }
+    
 }

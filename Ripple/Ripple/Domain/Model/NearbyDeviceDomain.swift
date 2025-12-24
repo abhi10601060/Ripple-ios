@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct NearbyDeviceDomain: Identifiable {
+struct NearbyDeviceDomain: Identifiable, Hashable {
     let id: String
     let endpointId: String
     let deviceName: String
@@ -47,6 +47,21 @@ struct NearbyDeviceDomain: Identifiable {
     }
 }
 
+extension NearbyDevice{
+    func toNearbyDeviceDomain() -> NearbyDeviceDomain {
+        return NearbyDeviceDomain(
+            id: self.id,
+            endpointId: self.endpointId,
+            deviceName: self.deviceName,
+            model: self.model,
+            savedDeviceName: "",
+            connectionState: self.connectionState,
+            visibility: .online,
+            lastSeen: self.lastSeen
+        )
+    }
+}
+
 
 extension NearbyDeviceDomain{
     static let mock = NearbyDeviceDomain(
@@ -59,7 +74,7 @@ extension NearbyDeviceDomain{
         lastSeen: Int64(Date().timeIntervalSince1970 * 1000),
         signalStrength: 100,
         recentMessage: TextMessageDomain.mock,
-        allMessages: [TextMessageDomain.mock, TextMessageDomain.mock]
+        allMessages: [TextMessageDomain.mock, TextMessageDomain.mock1, TextMessageDomain.mock2, TextMessageDomain.mock3]
     )
     
     static let mock1 = NearbyDeviceDomain(
@@ -72,7 +87,7 @@ extension NearbyDeviceDomain{
         lastSeen: Int64(Date().timeIntervalSince1970 * 1000),
         signalStrength: 100,
         recentMessage: TextMessageDomain.mock,
-        allMessages: [TextMessageDomain.mock, TextMessageDomain.mock]
+        allMessages: [TextMessageDomain.mock, TextMessageDomain.mock1, TextMessageDomain.mock2, TextMessageDomain.mock3]
     )
     
     static let mock2 = NearbyDeviceDomain(
@@ -85,6 +100,8 @@ extension NearbyDeviceDomain{
         lastSeen: Int64(Date().timeIntervalSince1970 * 1000),
         signalStrength: 100,
         recentMessage: TextMessageDomain.mock,
-        allMessages: [TextMessageDomain.mock, TextMessageDomain.mock]
+        allMessages: [TextMessageDomain.mock, TextMessageDomain.mock1, TextMessageDomain.mock2, TextMessageDomain.mock3]
     )
 }
+
+

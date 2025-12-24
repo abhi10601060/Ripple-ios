@@ -9,7 +9,9 @@ import SwiftUI
 
 struct SplashScreen: View {
     
+    @Binding var navigationPath: NavigationPath
     @State private var userName: String = ""
+    @State private var navigateToHomeScreen: Bool = false
     
     var body: some View {
         ZStack(alignment: .center){
@@ -36,15 +38,24 @@ struct SplashScreen: View {
                 
                 RippleButton(title: "Continue")
                     .padding(.top, 20)
+                    .onTapGesture {
+                        if !userName.isEmpty {
+                            navigationPath.append("home")
+                        }
+                    }
             }
             
         }
         .padding(15)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         .background(Color.darkBG)
+        .toolbarVisibility(.hidden, for: .navigationBar)
     }
 }
 
 #Preview {
-    SplashScreen()
+    @Previewable @State var navpath = NavigationPath()
+    SplashScreen(
+        navigationPath: $navpath
+    )
 }

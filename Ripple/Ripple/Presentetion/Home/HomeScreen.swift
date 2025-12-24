@@ -9,6 +9,8 @@ import SwiftUI
 
 struct HomeScreen: View {
     
+    @StateObject var homeScreenViewModel = HomeScreenViewModel()
+    @Binding var navigationPath: NavigationPath
     @State var selectedTab: String = "Chats"
     
     var body: some View {
@@ -19,10 +21,14 @@ struct HomeScreen: View {
                 HomeScreenHeader
                 
                 if selectedTab == "Chats" {
-                    InboxScreen()
+                    InboxScreen(
+                        navigationPath: $navigationPath
+                    )
                 }
                 else{
-                    ActiveUsersScreen()
+                    ActiveUsersScreen(
+                        viewModel: homeScreenViewModel
+                    )
                 }
             }
             .frame(
@@ -45,6 +51,7 @@ struct HomeScreen: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(.darkBG)
+        .toolbar(.hidden, for: .navigationBar)
     }
 
     var HomeScreenHeader: some View {
@@ -62,7 +69,10 @@ struct HomeScreen: View {
 }
 
 #Preview {
-    NavigationStack {
-        HomeScreen()
+    @Previewable @State var navpath = NavigationPath()
+    NavigationStack(path: $navpath) {
+        HomeScreen(
+            navigationPath: $navpath
+        )
     }
 }

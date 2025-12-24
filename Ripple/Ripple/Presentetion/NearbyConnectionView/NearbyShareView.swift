@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct NearbyShareView: View {
-    @StateObject private var manager = NearbyShareManager.shared
+    @StateObject private var manager = NearbyConnectionManager.shared
     @State private var messageText = ""
     @State private var selectedDeviceId: String?
     @State private var showingMessageSheet = false

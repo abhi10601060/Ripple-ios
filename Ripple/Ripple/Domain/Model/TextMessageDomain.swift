@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct TextMessageDomain {
+struct TextMessageDomain: Identifiable, Hashable {
     let id: Int64
     let content: String
     let senderId: String
@@ -34,8 +34,30 @@ struct TextMessageDomain {
 
 extension TextMessageDomain{
     static let mock = TextMessageDomain(
+        id: 1,
         content: "Hello How are you?",
         senderId: "123",
+        receiverId: "abc"
+    )
+    
+    static let mock1 = TextMessageDomain(
+        id: 2,
+        content: "Excellent, How are you...All good...?",
+        senderId: "456",
+        receiverId: "abc"
+    )
+    
+    static let mock2 = TextMessageDomain(
+        id: 3,
+        content: "yes",
+        senderId: "123",
+        receiverId: "abc"
+    )
+    
+    static let mock3 = TextMessageDomain(
+        id: 4,
+        content: "nice nice",
+        senderId: "456",
         receiverId: "abc"
     )
 }
