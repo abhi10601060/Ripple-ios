@@ -11,6 +11,8 @@ struct ChatScreen: View {
 
     let nearbyDevice: NearbyDeviceDomain
     private let scrollId = "scrollToBottom"
+    @StateObject private var chatScreenViewModel: ChatScreenViewModel = ChatScreenViewModel()
+
 
     @State var messageText: String = ""
     @Environment(\.dismiss) var dismiss
@@ -23,10 +25,10 @@ struct ChatScreen: View {
                 ScrollView {
                     ScrollViewReader { proxy in
                         LazyVStack {
-                            ForEach(nearbyDevice.allMessages) { message in
+                            ForEach(chatScreenViewModel.allMessages) { message in
                                 ChatTextMessage(
                                     message: message,
-                                    isFromCurretUser: message.senderId
+                                    isFromCurretUser: message.receiverId
                                         == nearbyDevice.id
                                 )
                             }
@@ -56,6 +58,9 @@ struct ChatScreen: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(.darkBG)
         .toolbar(.hidden, for: .navigationBar)
+        .onAppear{
+            chatScreenViewModel.assignCurrentDevice(currentNearbyDevice: nearbyDevice)
+        }
     }
 
     var ChatScreenHeader: some View {
@@ -90,6 +95,10 @@ struct ChatScreen: View {
                 size: 23,
                 iconName: "paperplane.fill"
             )
+            .onTapGesture {
+                chatScreenViewModel.sendMessage(messageText)
+                messageText = ""
+            }
         }
     }
 }

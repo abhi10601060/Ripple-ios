@@ -35,6 +35,20 @@ struct TextMessage: Identifiable, Codable {
     }
 }
 
+extension TextMessageDomain{
+    func toTextMessage() -> TextMessage {
+        TextMessage(
+            id: self.id,
+            content: self.content,
+            senderId: self.senderId,
+            receiverId: self.receiverId,
+            endpointId: self.endpointId,
+            timestamp: self.timestamp,
+            deliveryStatus: self.deliveryStatus
+        )
+    }
+}
+
 
 //struct TextMessage: Identifiable, Codable {
 //    let id: String

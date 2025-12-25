@@ -164,19 +164,20 @@ class NearbyConnectionManager: NSObject, ObservableObject {
     }
     
     func sendTextMessage(_ message: TextMessage) async -> Bool {
-        guard let endpointId = findEndpointID(for: message.receiverId) else {
-            var failedMessage = message
-            failedMessage.deliveryStatus = .failed
-            addSentMessage(failedMessage)
-            print("Cannot find endpoint for receiver: \(message.receiverId)")
-            return false
-        }
-        
+//        guard let endpointId = findEndpointID(for: message.receiverId) else {
+//            var failedMessage = message
+//            failedMessage.deliveryStatus = .failed
+//            addSentMessage(failedMessage)
+//            print("Cannot find endpoint for receiver: \(message.receiverId)")
+//            return false
+//        }
+//        
         do {
             let encoder = JSONEncoder()
-            let messageData = try encoder.encode(message)
+            let messageData = try encoder.encode(message.toTextMessageDto())
+            print("Sending message to: \(messageData)")
             
-            let payloadID = connectionManager.send(messageData, to: [endpointId])
+            let payloadID = connectionManager.send(messageData, to: [message.endpointId])
             print("Sent payload with ID: \(payloadID)")
             
             var sentMessage = message
@@ -379,10 +380,11 @@ extension NearbyConnectionManager: ConnectionManagerDelegate {
     ) {
         Task { @MainActor in
             do {
+                print("json from sender: \(data.description)")
                 let decoder = JSONDecoder()
-                let message = try decoder.decode(TextMessage.self, from: data)
+                let messageDto = try decoder.decode(TextMessageDto.self, from: data)
                 
-                var receivedMessage = message
+                var receivedMessage = TextMessage(content: messageDto.content, senderId: messageDto.senderId, receiverId: messageDto.receiverId)
                 receivedMessage.deliveryStatus = .delivered
                 
                 addReceivedMessage(receivedMessage)

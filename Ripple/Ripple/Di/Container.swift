@@ -29,4 +29,11 @@ extension Container{
         }.singleton
     }
     
+    var chatRepo: Factory<ChatRepo>{
+        Factory(self){
+            MainActor.assumeIsolated {
+                ChatRepoImpl(nearbyShareManager:  self.nerbyConnectionManager())
+            }
+        }
+    }
 }

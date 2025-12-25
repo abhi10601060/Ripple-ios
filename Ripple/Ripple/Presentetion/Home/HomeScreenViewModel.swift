@@ -14,6 +14,7 @@ import FactoryKit
 class HomeScreenViewModel: ObservableObject {
     
     private let getDiscoveredDevicesUseCase: GetDiscoveredDevicesUseCase = GetDiscoveredDevicesUseCase()
+    private let getConnectedDevicesUseCase: GetConnectedDevicesUseCase = GetConnectedDevicesUseCase()
     private let startAdvertisingUseCase: StartAdvertisingUseCase = StartAdvertisingUseCase()
     private let startDiscoveryUseCase: StartDiscoveryUseCase = StartDiscoveryUseCase()
     private let connectNearbyDeviceUseCase: ConnectNearbyDeviceUseCase = ConnectNearbyDeviceUseCase()
@@ -42,7 +43,7 @@ class HomeScreenViewModel: ObservableObject {
     }
     
     private func observeConnectedDevices() {
-        GetConnectedDevicesUseCase().invoke()
+        getConnectedDevicesUseCase.invoke()
             .receive(on: DispatchQueue.main)
             .replaceError(with: [])
             .assign(to: &$connectedDevices)
