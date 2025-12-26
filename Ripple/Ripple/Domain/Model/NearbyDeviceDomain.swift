@@ -62,6 +62,23 @@ extension NearbyDevice{
     }
 }
 
+extension NearbyDeviceRealm{
+    func toNearbyDeviceDomain() -> NearbyDeviceDomain {
+        return NearbyDeviceDomain(
+            id: self.id,
+            endpointId: self.endpointId,
+            deviceName: self.deviceName,
+            model: self.model,
+            savedDeviceName: self.savedDeviceName,
+            connectionState: self.connectionState,
+            visibility: self.visibility,
+            lastSeen: self.lastSeen,
+            recentMessage: self.recentMessage?.toTextMessageDomain(),
+            allMessages: self.allMessages.map{ $0.toTextMessageDomain() }
+            )
+    }
+}
+
 
 extension NearbyDeviceDomain{
     static let mock = NearbyDeviceDomain(

@@ -6,9 +6,10 @@
 //
 
 import Foundation
+import RealmSwift
 
 
-enum DeviceVisibility{
+enum DeviceVisibility: String, PersistableEnum{
     case online
     case offline
 }

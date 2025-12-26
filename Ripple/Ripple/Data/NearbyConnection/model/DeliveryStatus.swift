@@ -6,9 +6,10 @@
 //
 
 import Foundation
+import RealmSwift
 
 
-enum DeliveryStatus: String, Codable {
+enum DeliveryStatus: String, Codable, PersistableEnum {
     case pending
     case sent
     case delivered

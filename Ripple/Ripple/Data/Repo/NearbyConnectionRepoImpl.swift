@@ -7,8 +7,12 @@
 
 import Foundation
 import Combine
+import FactoryKit
 
 struct NearbyConnectionRepoImpl: NearbyConnectionRepo {
+    
+    //MARK: - Dependencies
+    @Injected(\.nearbyDeviceRealmRepo) var nearbyDevicePersistanceRepo: NearbyDevicePersistenceRepo
 
     let nearbyShareManager: NearbyConnectionManager
     
@@ -48,11 +52,18 @@ struct NearbyConnectionRepoImpl: NearbyConnectionRepo {
         return await nearbyShareManager.disconnectFromDevice(endpointId: endpoitId)
     }
     
-    func getNearbyDiscoveredDevices() -> AnyPublisher<[NearbyDevice], Never> {
-        return nearbyShareManager.$discoveredDevices.eraseToAnyPublisher()
+    func getNearbyDiscoveredDevices() -> AnyPublisher<[NearbyDeviceRealm], Never> {
+        return nearbyDevicePersistanceRepo.getAllDiscoveredNearbyDevices()
     }
     
     func getNearbyConnectedDevices() -> AnyPublisher<[NearbyDevice], Never> {
         return nearbyShareManager.$connectedDevices.eraseToAnyPublisher()
     }
+    
+    func markAllDeviceLost() async {
+        Task{
+            try? await nearbyDevicePersistanceRepo.markAllDevicesAsLost()
+        }
+    }
+    
 }

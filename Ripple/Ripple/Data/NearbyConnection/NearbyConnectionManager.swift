@@ -11,6 +11,7 @@ import NearbyConnections
 import Combine
 import UIKit
 import os
+import FactoryKit
 
 // MARK: - Models
 struct ClusterInfo: Identifiable {
@@ -27,11 +28,13 @@ struct ClusterInfo: Identifiable {
 
 
 
-
 // MARK: - NearbyShareManager
 
 @MainActor
 class NearbyConnectionManager: NSObject, ObservableObject {
+    
+    //MARK: - Dependencies
+    @Injected(\.nearbyDeviceRealmRepo) var nearbyDevicePersistanceRepo: NearbyDevicePersistenceRepo
     
     // MARK: - Logger
 
@@ -270,6 +273,11 @@ class NearbyConnectionManager: NSObject, ObservableObject {
         // Update in discovered devices
         if let index = discoveredDevices.firstIndex(where: { $0.endpointId == endpointId }) {
             discoveredDevices[index].connectionState = state
+        }
+        
+        // Update in realm
+        Task{
+            try? await nearbyDevicePersistanceRepo.updateConnectionState(endpointId: endpointId, connectionState: state)
         }
         
         // Update connected devices list
@@ -544,6 +552,14 @@ extension NearbyConnectionManager: DiscovererDelegate {
             
             endpointToDeviceID[endpointID] = device.deviceName
             addDiscoveredDevice(device)
+            Task{
+                do{
+                   try await nearbyDevicePersistanceRepo.upsertDiscoveredNearbyDevice(device)
+                }
+                catch {
+                    print("error saving discoverd deivce to db: \(error.localizedDescription)")
+                }
+            }
         }
     }
     

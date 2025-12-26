@@ -22,7 +22,9 @@ protocol NearbyConnectionRepo {
     
     func disconnectNearbyDevice(endpoitId: String) async -> Bool
     
-    func getNearbyDiscoveredDevices() -> AnyPublisher<[NearbyDevice], Never>
+    func getNearbyDiscoveredDevices() -> AnyPublisher<[NearbyDeviceRealm], Never>
     
     func getNearbyConnectedDevices() -> AnyPublisher<[NearbyDevice], Never>
+    
+    func markAllDeviceLost() async
 }

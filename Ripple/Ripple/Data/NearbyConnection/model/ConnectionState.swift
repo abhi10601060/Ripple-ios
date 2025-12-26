@@ -6,9 +6,10 @@
 //
 
 import Foundation
+import RealmSwift
 
 
-enum ConnectionState: String, Codable {
+enum ConnectionState: String, Codable, PersistableEnum {
     case discovered
     case connecting
     case connected

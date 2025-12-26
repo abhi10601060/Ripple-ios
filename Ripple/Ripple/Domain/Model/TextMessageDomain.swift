@@ -48,6 +48,19 @@ extension TextMessage{
     }
 }
 
+extension TextMessageRealm{
+    func toTextMessageDomain() -> TextMessageDomain {
+        return  TextMessageDomain(
+            id: self.id,
+            content: self.content,
+            senderId: self.senderId,
+            receiverId: self.receiverId,
+            endpointId: self.senderId,
+            timestamp: self.timestamp,
+            deliveryStatus: self.deliveryStatus)
+    }
+}
+
 extension TextMessageDomain{
     static let mock = TextMessageDomain(
         id: 1,
