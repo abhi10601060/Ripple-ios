@@ -56,8 +56,8 @@ struct NearbyConnectionRepoImpl: NearbyConnectionRepo {
         return nearbyDevicePersistanceRepo.getAllDiscoveredNearbyDevices()
     }
     
-    func getNearbyConnectedDevices() -> AnyPublisher<[NearbyDevice], Never> {
-        return nearbyShareManager.$connectedDevices.eraseToAnyPublisher()
+    func getNearbyConnectedDevices() -> AnyPublisher<[NearbyDeviceRealm], Never> {
+        return nearbyDevicePersistanceRepo.getAllNearbyDevices().eraseToAnyPublisher()
     }
     
     func markAllDeviceLost() async {

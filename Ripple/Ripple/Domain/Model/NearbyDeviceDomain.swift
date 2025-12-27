@@ -79,7 +79,6 @@ extension NearbyDeviceRealm{
     }
 }
 
-
 extension NearbyDeviceDomain{
     static let mock = NearbyDeviceDomain(
         id: "123",
