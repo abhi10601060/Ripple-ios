@@ -37,6 +37,14 @@ extension Container{
         }
     }
     
+    var textMessageRealmRepo: Factory<TextMessagePersistenceRepo>{
+        Factory(self){
+            MainActor.assumeIsolated{
+                TextMessageRealmRepo(realm: self.realm())
+            }
+        }
+    }
+    
     var nerbyConnectionManager: Factory<NearbyConnectionManager>{
         Factory(self) { MainActor.assumeIsolated { NearbyConnectionManager.shared } }
             .singleton

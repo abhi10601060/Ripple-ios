@@ -66,4 +66,8 @@ struct NearbyConnectionRepoImpl: NearbyConnectionRepo {
         }
     }
     
+    func getNearbyDeviceById(deviceId: String) -> AnyPublisher<NearbyDeviceRealm?, Never> {
+        return  nearbyDevicePersistanceRepo.getNearbyDeviceById(deviceId)
+    }
+    
 }

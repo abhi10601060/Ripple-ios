@@ -10,19 +10,35 @@ import Foundation
 
 @MainActor
 class ChatScreenViewModel: ObservableObject {
+    
+    let getNearbyDeviceByIdUseCase: GetNearbyDeviceByIdUseCase = GetNearbyDeviceByIdUseCase()
 
     let sendTextMessageUseCase: SendTextMessageUseCase =
         SendTextMessageUseCase()
     let getAllMessgaesUseCase: GetAllMessagesUseCase = GetAllMessagesUseCase()
 
     @Published var allMessages: [TextMessageDomain] = []
+    @Published var currentNearbyDeviceDomain: NearbyDeviceDomain? = nil
 
     var currentNearbyDevice: NearbyDeviceDomain = NearbyDeviceDomain.mock
 
     func assignCurrentDevice(currentNearbyDevice: NearbyDeviceDomain) {
         self.currentNearbyDevice = currentNearbyDevice
 
-        observeAllMessagesForCurrentUser()
+//        observeAllMessagesForCurrentUser()
+        getNearbyDeviceByIdUseCase.invoke(deviceId: currentNearbyDevice.id)
+            .receive(on: DispatchQueue.main)
+            .replaceError(with: nil)
+            .assign(to: &$currentNearbyDeviceDomain)
+            
+//            .sink{ device in
+//            if(device != nil){
+//                self.nearbyDeviceDomain = device
+//            }
+//            else{
+//                // Add a device not found error handleling
+//            }
+//        }
     }
 
     func sendMessage(_ message: String) {

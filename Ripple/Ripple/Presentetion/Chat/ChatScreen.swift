@@ -25,7 +25,7 @@ struct ChatScreen: View {
                 ScrollView {
                     ScrollViewReader { proxy in
                         LazyVStack {
-                            ForEach(chatScreenViewModel.allMessages) { message in
+                            ForEach(chatScreenViewModel.currentNearbyDeviceDomain?.allMessages ?? []) { message in
                                 ChatTextMessage(
                                     message: message,
                                     isFromCurretUser: message.receiverId

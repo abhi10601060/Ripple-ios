@@ -27,4 +27,6 @@ protocol NearbyConnectionRepo {
     func getNearbyConnectedDevices() -> AnyPublisher<[NearbyDeviceRealm], Never>
     
     func markAllDeviceLost() async
+    
+    func getNearbyDeviceById(deviceId: String) -> AnyPublisher<NearbyDeviceRealm?, Never>
 }

@@ -35,6 +35,7 @@ class NearbyConnectionManager: NSObject, ObservableObject {
     
     //MARK: - Dependencies
     @Injected(\.nearbyDeviceRealmRepo) var nearbyDevicePersistanceRepo: NearbyDevicePersistenceRepo
+    @Injected(\.textMessageRealmRepo) var textMessagePersistenceRepo: TextMessagePersistenceRepo
     
     // MARK: - Logger
 
@@ -185,6 +186,11 @@ class NearbyConnectionManager: NSObject, ObservableObject {
             
             var sentMessage = message
             sentMessage.deliveryStatus = .sent
+            
+            Task{
+                try? await textMessagePersistenceRepo.insertSentMessage(sentMessage.toTextMessageRealm())
+            }
+            
             addSentMessage(sentMessage)
             
             print("Message sent successfully")
@@ -324,6 +330,26 @@ extension NearbyConnectionManager: ConnectionManagerDelegate {
     
     func connectionManager(_ connectionManager: NearbyConnections.ConnectionManager, didReceiveTransferUpdate update: NearbyConnections.TransferUpdate, from endpointID: NearbyConnections.EndpointID, forPayload payloadID: NearbyConnections.PayloadID) {
         
+        Task{ @MainActor in
+            switch update {
+            case .success:
+                Task{
+                    try? await textMessagePersistenceRepo.updateDeliveryStatus(id: payloadID, status: .delivered)
+                }
+                
+            case .failure:
+                print("failed message transfer")
+                Task{
+                    try? await textMessagePersistenceRepo.updateDeliveryStatus(id: payloadID, status: .failed)
+                }
+                
+            case .progress(_):
+                print("message transfer of \(payloadID) in progress to \(endpointID)")
+                
+            case .canceled:
+                print("message transfer cancelled")
+            }
+        }
     }
     
     
@@ -394,6 +420,10 @@ extension NearbyConnectionManager: ConnectionManagerDelegate {
                 
                 var receivedMessage = TextMessage(content: messageDto.content, senderId: messageDto.senderId, receiverId: messageDto.receiverId)
                 receivedMessage.deliveryStatus = .delivered
+                
+                Task{
+                    try? await textMessagePersistenceRepo.insertReceivedMessage(receivedMessage.toTextMessageRealm())
+                }
                 
                 addReceivedMessage(receivedMessage)
                 logger.info("Message received: \(receivedMessage.content)")
