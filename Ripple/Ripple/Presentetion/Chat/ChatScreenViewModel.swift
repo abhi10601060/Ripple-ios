@@ -11,7 +11,8 @@ import Foundation
 @MainActor
 class ChatScreenViewModel: ObservableObject {
     
-    let getNearbyDeviceByIdUseCase: GetNearbyDeviceByIdUseCase = GetNearbyDeviceByIdUseCase()
+    private let getNearbyDeviceByIdUseCase: GetNearbyDeviceByIdUseCase = GetNearbyDeviceByIdUseCase()
+    private let connectNearbyDeviceUseCase: ConnectNearbyDeviceUseCase = ConnectNearbyDeviceUseCase()
 
     let sendTextMessageUseCase: SendTextMessageUseCase =
         SendTextMessageUseCase()
@@ -30,15 +31,6 @@ class ChatScreenViewModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .replaceError(with: nil)
             .assign(to: &$currentNearbyDeviceDomain)
-            
-//            .sink{ device in
-//            if(device != nil){
-//                self.nearbyDeviceDomain = device
-//            }
-//            else{
-//                // Add a device not found error handleling
-//            }
-//        }
     }
 
     func sendMessage(_ message: String) {
@@ -71,6 +63,19 @@ class ChatScreenViewModel: ObservableObject {
             }
             .assign(to: &$allMessages)
 
+    }
+    
+    func connectToCurrentNearbyDevice(){
+        guard let currentDevice = currentNearbyDeviceDomain else {
+            return
+        }
+        print("connecting to \(currentDevice.deviceName)")
+        Task{
+            let success = await connectNearbyDeviceUseCase.invoke(endpointId: currentDevice.endpointId)
+            if !success {
+                // add a error message
+            }
+        }
     }
 
 }

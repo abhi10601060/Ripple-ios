@@ -46,14 +46,55 @@ struct ChatScreen: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            
+            if chatScreenViewModel.currentNearbyDeviceDomain?.visibility == .offline {
+                Text("Device offline. Cannot connect...")
+                    .font(Font.custom(FontsConstants.Courier.rawValue, size: 16))
+                    .foregroundColor(.gray)
+                    .frame(
+                        maxWidth: .infinity,
+                        alignment: .center
+                    )
+                    .padding(10)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.gray, lineWidth: 1)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                    .padding(.horizontal, 10)
 
-            ChatBox
-                .frame(
-                    maxWidth: .infinity,
-                    maxHeight: .infinity,
-                    alignment: .bottom
-                )
-                .padding(.horizontal, 10)
+            }
+            else if chatScreenViewModel.currentNearbyDeviceDomain?.connectionState == .connected {
+                ChatBox
+                    .frame(
+                        maxWidth: .infinity,
+                        maxHeight: .infinity,
+                        alignment: .bottom
+                    )
+                    .padding(.horizontal, 10)            }
+            else {
+                Text("Tap to connect...")
+                    .font(Font.custom(FontsConstants.Courier.rawValue, size: 16))
+                    .foregroundColor(.gray)
+                    .frame(
+                        maxWidth: .infinity,
+                        alignment: .center
+                    )
+                    .padding(10)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.gray, lineWidth: 1)
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .onTapGesture {
+                        chatScreenViewModel.connectToCurrentNearbyDevice()
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                    .padding(.horizontal, 10)
+            }
+
+            
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(.darkBG)
