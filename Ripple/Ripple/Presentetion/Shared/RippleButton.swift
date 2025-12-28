@@ -30,6 +30,6 @@ struct RippleButton: View {
         RippleButton(title: "Continue")
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(.darkBG)
+    .background(.darkBg)
     
 }

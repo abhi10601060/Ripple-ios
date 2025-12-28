@@ -42,7 +42,7 @@ struct RippleTextField: View {
 #Preview {
     @Previewable @State var text = ""
     ZStack(alignment: .center) {
-        Color.darkBG
+        Color.darkBg
             .edgesIgnoringSafeArea(.all)
 
         RippleTextField(

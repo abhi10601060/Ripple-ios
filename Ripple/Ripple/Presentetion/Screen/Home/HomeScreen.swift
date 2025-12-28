@@ -10,6 +10,7 @@ import SwiftUI
 struct HomeScreen: View {
     
     @StateObject var homeScreenViewModel = HomeScreenViewModel()
+    @StateObject var notificationManager: NotificationManager = .init()
     @Binding var navigationPath: NavigationPath
     @State var selectedTab: String = "Chats"
     
@@ -51,13 +52,19 @@ struct HomeScreen: View {
                 .padding(.bottom, 10)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(.darkBG)
+        .background(.darkBg)
         .toolbar(.hidden, for: .navigationBar)
+        .onAppear{
+            notificationManager.requestPermission()
+        }
     }
 
     var HomeScreenHeader: some View {
         HStack {
             CircularImage(imageName: "WhiteRippleLogo", size: 40)
+                .onTapGesture {
+                    notificationManager.scheduleNotificationWithActions(title: "This is test", body: "This test Body", timeInterval: 2)
+                }
 
             Text(selectedTab)
                 .font(Font.custom(FontsConstants.Montserrat.rawValue, size: 30))

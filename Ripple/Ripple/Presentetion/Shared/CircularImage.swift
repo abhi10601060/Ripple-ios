@@ -64,6 +64,6 @@ struct CircularImage: View {
     ZStack{
         CircularImage(imageName: "xmark.circle.fill", size: 64)
     }
-    .background(.darkBG)
+    .background(.darkBg)
     
 }

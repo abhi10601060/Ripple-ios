@@ -48,7 +48,7 @@ struct SplashScreen: View {
         }
         .padding(15)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-        .background(Color.darkBG)
+        .background(Color.darkBg)
         .toolbarVisibility(.hidden, for: .navigationBar)
     }
 }

@@ -38,7 +38,7 @@ struct InboxScreen: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .background(.darkBG)
+        .background(.darkBg)
     }
     
     var SearchBox: some View {

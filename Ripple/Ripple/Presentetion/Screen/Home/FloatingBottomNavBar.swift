@@ -84,5 +84,5 @@ struct FloatingNavBarItem: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(.darkBG)
+    .background(.darkBg)
 }

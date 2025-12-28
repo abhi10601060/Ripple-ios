@@ -96,5 +96,5 @@ struct InboxItem: View {
         )
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(.darkBG)
+    .background(.darkBg)
 }

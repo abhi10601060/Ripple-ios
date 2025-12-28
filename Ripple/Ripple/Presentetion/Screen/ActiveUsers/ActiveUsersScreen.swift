@@ -32,5 +32,5 @@ struct ActiveUsersScreen: View {
         ActiveUsersScreen(viewModel: HomeScreenViewModel())
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(.darkBG)
+    .background(.darkBg)
 }

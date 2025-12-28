@@ -97,7 +97,7 @@ struct ChatScreen: View {
             
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(.darkBG)
+        .background(.darkBg)
         .toolbar(.hidden, for: .navigationBar)
         .onAppear{
             chatScreenViewModel.assignCurrentDevice(currentNearbyDevice: nearbyDevice)
