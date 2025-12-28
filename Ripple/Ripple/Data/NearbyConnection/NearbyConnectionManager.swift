@@ -11,59 +11,14 @@ import NearbyConnections
 import Combine
 import UIKit
 import os
+import FactoryKit
 
 // MARK: - Models
-
-enum ConnectionState: String, Codable {
-    case discovered
-    case connecting
-    case connected
-    case disconnected
-    case error
-}
-
-enum DeliveryStatus: String, Codable {
-    case pending
-    case sent
-    case delivered
-    case failed
-}
-
-struct NearbyDevice: Identifiable, Equatable {
-    let id: String
-    let deviceName: String
-    var connectionState: ConnectionState
-    
-    init(id: String = UUID().uuidString, deviceName: String, connectionState: ConnectionState) {
-        self.id = id
-        self.deviceName = deviceName
-        self.connectionState = connectionState
-    }
-}
-
-struct TextMessage: Identifiable, Codable {
-    let id: String
-    let content: String
-    let senderId: String
-    let receiverId: String
-    var deliveryStatus: DeliveryStatus
-    let timestamp: Date
-    
-    init(id: String = UUID().uuidString, content: String, senderId: String, receiverId: String, deliveryStatus: DeliveryStatus, timestamp: Date = Date()) {
-        self.id = id
-        self.content = content
-        self.senderId = senderId
-        self.receiverId = receiverId
-        self.deliveryStatus = deliveryStatus
-        self.timestamp = timestamp
-    }
-}
-
 struct ClusterInfo: Identifiable {
     let id: String
     var devices: [NearbyDevice]
     var isActive: Bool
-    
+
     init(id: String = UUID().uuidString, devices: [NearbyDevice], isActive: Bool) {
         self.id = id
         self.devices = devices
@@ -76,7 +31,11 @@ struct ClusterInfo: Identifiable {
 // MARK: - NearbyShareManager
 
 @MainActor
-class NearbyShareManager: NSObject, ObservableObject {
+class NearbyConnectionManager: NSObject, ObservableObject {
+    
+    //MARK: - Dependencies
+    @Injected(\.nearbyDeviceRealmRepo) var nearbyDevicePersistanceRepo: NearbyDevicePersistenceRepo
+    @Injected(\.textMessageRealmRepo) var textMessagePersistenceRepo: TextMessagePersistenceRepo
     
     // MARK: - Logger
 
@@ -84,7 +43,7 @@ class NearbyShareManager: NSObject, ObservableObject {
     
     // MARK: - Singleton
     
-    static let shared = NearbyShareManager()
+    static let shared = NearbyConnectionManager()
     
     // MARK: - Published Properties
     
@@ -168,64 +127,70 @@ class NearbyShareManager: NSObject, ObservableObject {
         return true
     }
     
-    func connectToDevice(deviceId: String) async -> Bool {
-        guard let endpointId = findEndpointID(for: deviceId) else {
-            logger.debug("Cannot find endpoint for device: \(deviceId)")
-            return false
-        }
+    func connectToDevice(endpointId: String) async -> Bool {
+//        guard let endpointId = findEndpointID(for: endpointId) else {
+//            logger.debug("Cannot find endpoint for device: \(endpointId) \(endpointId.count)")
+//            return false
+//        }
         
-        updateDeviceConnectionState(deviceId: deviceId, state: .connecting)
+        updateDeviceConnectionState(endpointId: endpointId, state: .connecting)
         
         // Request connection with device name as context
         let context = deviceName.data(using: .utf8) ?? Data()
         discoverer?.requestConnection(to: endpointId, using: context) { [weak self] accepted in
             Task { @MainActor in
                 if (accepted != nil) {
-                    self?.logger.info("Connection request accepted for: \(deviceId)")
-                    self?.updateDeviceConnectionState(deviceId: deviceId, state: .connected)
+                    self?.logger.info("Connection request accepted for: \(endpointId)")
+                    self?.updateDeviceConnectionState(endpointId: endpointId, state: .connected)
                 } else {
-                    self?.logger.info("Connection request rejected for: \(deviceId)")
-                    self?.updateDeviceConnectionState(deviceId: deviceId, state: .error)
+                    self?.logger.info("Connection request rejected for: \(endpointId)")
+                    self?.updateDeviceConnectionState(endpointId: endpointId, state: .disconnected)
                 }
             }
         }
         
-        logger.debug("Connection requested to: \(deviceId)")
+        logger.debug("Connection requested to: \(endpointId)")
         return true
     }
     
-    func disconnectFromDevice(deviceId: String) async -> Bool {
-        guard let endpointId = findEndpointID(for: deviceId) else {
-            return false
-        }
+    func disconnectFromDevice(endpointId: String) async -> Bool {
+//        guard let endpointId = findEndpointID(for: endpointId) else {
+//            return false
+//        }
         
         connectionManager.disconnect(from: endpointId)
-        updateDeviceConnectionState(deviceId: deviceId, state: .disconnected)
+        updateDeviceConnectionState(endpointId: endpointId, state: .disconnected)
         connectionPool.removeValue(forKey: endpointId)
         endpointToDeviceID.removeValue(forKey: endpointId)
         
-        print("Disconnected from: \(deviceId)")
+        print("Disconnected from: \(endpointId)")
         return true
     }
     
     func sendTextMessage(_ message: TextMessage) async -> Bool {
-        guard let endpointId = findEndpointID(for: message.receiverId) else {
-            var failedMessage = message
-            failedMessage.deliveryStatus = .failed
-            addSentMessage(failedMessage)
-            print("Cannot find endpoint for receiver: \(message.receiverId)")
-            return false
-        }
-        
+//        guard let endpointId = findEndpointID(for: message.receiverId) else {
+//            var failedMessage = message
+//            failedMessage.deliveryStatus = .failed
+//            addSentMessage(failedMessage)
+//            print("Cannot find endpoint for receiver: \(message.receiverId)")
+//            return false
+//        }
+//        
         do {
             let encoder = JSONEncoder()
-            let messageData = try encoder.encode(message)
+            let messageData = try encoder.encode(message.toTextMessageDto())
+            print("Sending message to: \(messageData)")
             
-            let payloadID = connectionManager.send(messageData, to: [endpointId])
+            let payloadID = connectionManager.send(messageData, to: [message.endpointId])
             print("Sent payload with ID: \(payloadID)")
             
             var sentMessage = message
             sentMessage.deliveryStatus = .sent
+            
+            Task{
+                try? await textMessagePersistenceRepo.insertSentMessage(sentMessage.toTextMessageRealm())
+            }
+            
             addSentMessage(sentMessage)
             
             print("Message sent successfully")
@@ -244,7 +209,9 @@ class NearbyShareManager: NSObject, ObservableObject {
         let clusterId = UUID().uuidString
         let currentDevice = NearbyDevice(
             id: deviceName,
+            endpointId: "abc",
             deviceName: deviceName,
+            model: "iPhone 17",
             connectionState: .connected
         )
         
@@ -308,17 +275,22 @@ class NearbyShareManager: NSObject, ObservableObject {
         discoveredDevices.removeAll { $0.id == deviceId }
     }
     
-    private func updateDeviceConnectionState(deviceId: String, state: ConnectionState) {
+    private func updateDeviceConnectionState(endpointId: String, state: ConnectionState) {
         // Update in discovered devices
-        if let index = discoveredDevices.firstIndex(where: { $0.id == deviceId }) {
+        if let index = discoveredDevices.firstIndex(where: { $0.endpointId == endpointId }) {
             discoveredDevices[index].connectionState = state
+        }
+        
+        // Update in realm
+        Task{
+            try? await nearbyDevicePersistanceRepo.updateConnectionState(endpointId: endpointId, connectionState: state)
         }
         
         // Update connected devices list
         switch state {
         case .connected:
-            if let device = discoveredDevices.first(where: { $0.id == deviceId }) {
-                if !connectedDevices.contains(where: { $0.id == deviceId }) {
+            if let device = discoveredDevices.first(where: { $0.endpointId == endpointId }) {
+                if !connectedDevices.contains(where: { $0.endpointId == endpointId }) {
                     var connectedDevice = device
                     connectedDevice.connectionState = state
                     connectedDevices.append(connectedDevice)
@@ -326,10 +298,10 @@ class NearbyShareManager: NSObject, ObservableObject {
             }
             
         case .disconnected:
-            connectedDevices.removeAll { $0.id == deviceId }
+            connectedDevices.removeAll { $0.endpointId == endpointId }
             
         default:
-            if let index = connectedDevices.firstIndex(where: { $0.id == deviceId }) {
+            if let index = connectedDevices.firstIndex(where: { $0.endpointId == endpointId }) {
                 connectedDevices[index].connectionState = state
             }
         }
@@ -354,10 +326,30 @@ class NearbyShareManager: NSObject, ObservableObject {
 
 // MARK: - ConnectionManagerDelegate
 
-extension NearbyShareManager: ConnectionManagerDelegate {
+extension NearbyConnectionManager: ConnectionManagerDelegate {
     
     func connectionManager(_ connectionManager: NearbyConnections.ConnectionManager, didReceiveTransferUpdate update: NearbyConnections.TransferUpdate, from endpointID: NearbyConnections.EndpointID, forPayload payloadID: NearbyConnections.PayloadID) {
         
+        Task{ @MainActor in
+            switch update {
+            case .success:
+                Task{
+                    try? await textMessagePersistenceRepo.updateDeliveryStatus(id: payloadID, status: .delivered)
+                }
+                
+            case .failure:
+                print("failed message transfer")
+                Task{
+                    try? await textMessagePersistenceRepo.updateDeliveryStatus(id: payloadID, status: .failed)
+                }
+                
+            case .progress(_):
+                print("message transfer of \(payloadID) in progress to \(endpointID)")
+                
+            case .canceled:
+                print("message transfer cancelled")
+            }
+        }
     }
     
     
@@ -369,21 +361,21 @@ extension NearbyShareManager: ConnectionManagerDelegate {
             case .connected:
                 logger.info("Connected to: \(deviceId)")
                 connectionPool[endpointID] = deviceId
-                updateDeviceConnectionState(deviceId: deviceId, state: .connected)
+                updateDeviceConnectionState(endpointId: endpointID, state: .connected)
                 
             case .connecting:
                 logger.info("Connecting to: \(deviceId)")
-                updateDeviceConnectionState(deviceId: deviceId, state: .connecting)
+                updateDeviceConnectionState(endpointId: endpointID, state: .connecting)
                 
             case .disconnected:
                 logger.info("Disconnected from: \(deviceId)")
                 connectionPool.removeValue(forKey: endpointID)
                 endpointToDeviceID.removeValue(forKey: endpointID)
-                updateDeviceConnectionState(deviceId: deviceId, state: .disconnected)
+                updateDeviceConnectionState(endpointId: endpointID, state: .disconnected)
                 
             case .rejected:
                 logger.info("Connection rejected: \(deviceId)")
-                updateDeviceConnectionState(deviceId: deviceId, state: .error)
+                updateDeviceConnectionState(endpointId: endpointID, state: .error)
                 
 //            case .discovered:
 //                print("Discovered: \(deviceId)")
@@ -422,11 +414,16 @@ extension NearbyShareManager: ConnectionManagerDelegate {
     ) {
         Task { @MainActor in
             do {
+                print("json from sender: \(data.description)")
                 let decoder = JSONDecoder()
-                let message = try decoder.decode(TextMessage.self, from: data)
+                let messageDto = try decoder.decode(TextMessageDto.self, from: data)
                 
-                var receivedMessage = message
+                var receivedMessage = TextMessage(content: messageDto.content, senderId: messageDto.senderId, receiverId: messageDto.receiverId)
                 receivedMessage.deliveryStatus = .delivered
+                
+                Task{
+                    try? await textMessagePersistenceRepo.insertReceivedMessage(receivedMessage.toTextMessageRealm())
+                }
                 
                 addReceivedMessage(receivedMessage)
                 logger.info("Message received: \(receivedMessage.content)")
@@ -503,17 +500,17 @@ extension NearbyShareManager: ConnectionManagerDelegate {
             case .connected:
                 logger.info("Connected to: \(deviceId)")
                 connectionPool[endpointID] = deviceId
-                updateDeviceConnectionState(deviceId: deviceId, state: .connected)
+                updateDeviceConnectionState(endpointId: deviceId, state: .connected)
                 
             case .connecting:
                 logger.info("Connecting to: \(deviceId)")
-                updateDeviceConnectionState(deviceId: deviceId, state: .connecting)
+                updateDeviceConnectionState(endpointId: deviceId, state: .connecting)
                 
             case .disconnected:
                 logger.info("Disconnected from: \(deviceId)")
                 connectionPool.removeValue(forKey: endpointID)
                 endpointToDeviceID.removeValue(forKey: endpointID)
-                updateDeviceConnectionState(deviceId: deviceId, state: .disconnected)
+                updateDeviceConnectionState(endpointId: deviceId, state: .disconnected)
                 
 //            case .rejected:
 //                print("Connection rejected: \(deviceId)")
@@ -521,7 +518,7 @@ extension NearbyShareManager: ConnectionManagerDelegate {
                 
             case .discovered:
                 logger.info("Discovered: \(deviceId)")
-                updateDeviceConnectionState(deviceId: deviceId, state: .discovered)
+                updateDeviceConnectionState(endpointId: deviceId, state: .discovered)
 
                 
             case .error:
@@ -535,7 +532,7 @@ extension NearbyShareManager: ConnectionManagerDelegate {
 
 // MARK: - AdvertiserDelegate
 
-extension NearbyShareManager: AdvertiserDelegate {
+extension NearbyConnectionManager: AdvertiserDelegate {
     
     nonisolated func advertiser(
         _ advertiser: Advertiser,
@@ -554,7 +551,7 @@ extension NearbyShareManager: AdvertiserDelegate {
             
             endpointToDeviceID[endpointID] = remoteName
             connectionPool[endpointID] = remoteName
-            updateDeviceConnectionState(deviceId: remoteName, state: .connected)
+            updateDeviceConnectionState(endpointId: remoteName, state: .connected)
 
         }
     }
@@ -562,7 +559,7 @@ extension NearbyShareManager: AdvertiserDelegate {
 
 // MARK: - DiscovererDelegate
 
-extension NearbyShareManager: DiscovererDelegate {
+extension NearbyConnectionManager: DiscovererDelegate {
     
     nonisolated func discoverer(
         _ discoverer: Discoverer,
@@ -571,17 +568,28 @@ extension NearbyShareManager: DiscovererDelegate {
     ) {
         Task { @MainActor in
             // Extract device name from endpoint info
-            let deviceName = String(data: context, encoding: .utf8) ?? endpointID.description
-            logger.info("Found device: \(deviceName)")
+            let deviceDescription = String(data: context, encoding: .utf8) ?? endpointID.description
+            let descriptionSplits = deviceDescription.split(separator: ":")
+            logger.info("Found device: \(deviceDescription)")
             
             let device = NearbyDevice(
-                id: deviceName,
-                deviceName: deviceName,
+                id: String(descriptionSplits[2]),
+                endpointId: endpointID,
+                deviceName: String(descriptionSplits[0]),
+                model: String(descriptionSplits[1]),
                 connectionState: .discovered
             )
             
-            endpointToDeviceID[endpointID] = deviceName
+            endpointToDeviceID[endpointID] = device.deviceName
             addDiscoveredDevice(device)
+            Task{
+                do{
+                   try await nearbyDevicePersistanceRepo.upsertDiscoveredNearbyDevice(device)
+                }
+                catch {
+                    print("error saving discoverd deivce to db: \(error.localizedDescription)")
+                }
+            }
         }
     }
     

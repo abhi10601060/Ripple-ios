@@ -10,6 +10,7 @@
 		AB65C5ED2ED0BF2500282A1F /* FactoryKit in Frameworks */ = {isa = PBXBuildFile; productRef = AB65C5EC2ED0BF2500282A1F /* FactoryKit */; };
 		AB65C5F02ED0BF2D00282A1F /* Factory in Frameworks */ = {isa = PBXBuildFile; productRef = AB65C5EF2ED0BF2D00282A1F /* Factory */; };
 		AB65C5FE2ED0C94400282A1F /* NearbyConnections in Frameworks */ = {isa = PBXBuildFile; productRef = AB65C5FD2ED0C94400282A1F /* NearbyConnections */; };
+		ABA54E182EFE68F300E91A95 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = ABA54E172EFE68F300E91A95 /* RealmSwift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,6 +74,7 @@
 			files = (
 				AB65C5ED2ED0BF2500282A1F /* FactoryKit in Frameworks */,
 				AB65C5F02ED0BF2D00282A1F /* Factory in Frameworks */,
+				ABA54E182EFE68F300E91A95 /* RealmSwift in Frameworks */,
 				AB65C5FE2ED0C94400282A1F /* NearbyConnections in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -145,6 +147,7 @@
 				AB65C5EC2ED0BF2500282A1F /* FactoryKit */,
 				AB65C5EF2ED0BF2D00282A1F /* Factory */,
 				AB65C5FD2ED0C94400282A1F /* NearbyConnections */,
+				ABA54E172EFE68F300E91A95 /* RealmSwift */,
 			);
 			productName = Ripple;
 			productReference = AB65C5B42ED0BC0200282A1F /* Ripple.app */;
@@ -231,6 +234,7 @@
 			packageReferences = (
 				AB65C5EB2ED0BF2400282A1F /* XCRemoteSwiftPackageReference "Factory" */,
 				AB65C5FC2ED0C94400282A1F /* XCRemoteSwiftPackageReference "nearby" */,
+				ABA54E142EFE68F300E91A95 /* XCRemoteSwiftPackageReference "realm-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = AB65C5B52ED0BC0200282A1F /* Products */;
@@ -435,6 +439,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Ripple/Info.plist;
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "This app uses the local network to discover and connect with nearby devices for peer-to-peer communication.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -467,6 +472,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Ripple/Info.plist;
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "This app uses the local network to discover and connect with nearby devices for peer-to-peer communication.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -627,6 +633,14 @@
 				kind = branch;
 			};
 		};
+		ABA54E142EFE68F300E91A95 /* XCRemoteSwiftPackageReference "realm-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/realm/realm-swift.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -644,6 +658,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = AB65C5FC2ED0C94400282A1F /* XCRemoteSwiftPackageReference "nearby" */;
 			productName = NearbyConnections;
+		};
+		ABA54E172EFE68F300E91A95 /* RealmSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = ABA54E142EFE68F300E91A95 /* XCRemoteSwiftPackageReference "realm-swift" */;
+			productName = RealmSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

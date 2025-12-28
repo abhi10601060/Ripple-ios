@@ -11,9 +11,25 @@ import FactoryKit
 struct ContentView: View {
     
     @Injected(\.diTestModel) var diTestModel: DiTestModel
+    @State private var navigationPath: NavigationPath = NavigationPath()
     
     var body: some View {
-        NearbyShareView()
+        NavigationStack(path: $navigationPath){
+            SplashScreen(
+                navigationPath: $navigationPath
+            )
+            .navigationDestination(for: String.self, destination: {
+                string in
+                HomeScreen(
+                    navigationPath: $navigationPath
+                )
+            })
+            .navigationDestination(for: NearbyDeviceDomain.self, destination: { device in
+                ChatScreen(
+                    nearbyDevice: device
+                )
+            })
+        }
     }
 }
 
